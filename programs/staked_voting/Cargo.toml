@@ -1,0 +1,26 @@
+[package]
+name = "staked_voting"
+version = "0.1.0"
+description = "Created with Anchor"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "staked_voting"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[profile.release]
+overflow-checks = true
+
+[dependencies]
+anchor-lang = "^0.24.2"
+anchor-spl = {version = "0.24.2"}
+
+[programs.localnet]
+staked_voting = "HdGUGgAtzw6CGm4bB4DwNV6nUD9xHjBc8D6aSAheKZhd" 
