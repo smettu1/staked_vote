@@ -206,20 +206,37 @@ describe("StakedVoting", () => {
     .rpc();
   });
 
-    // Pick a winner
-    it("Pick a winner", async () => {
-      await program.methods
-        .pickWinner()
-        .accounts({
-          voter: voter.publicKey,
-          admin: voter_admin.publicKey,
-          systemProgram: SystemProgram.programId,
-        })
-        .signers([voter_admin])
-        .rpc();
-        let winner = await program.account.vote.fetch(voter.publicKey)
-        console.log(winner)
-      });
+  // Pick a winner
+  it("Pick a winner", async () => {
+    const [escrow_pda, escrow_bump] = await PublicKey.findProgramAddress(
+      [Buffer.from(ESCROW_ACCOUNT_PDA_SEED, 'utf8')],
+      program.programId
+    );
+
+
+    console.log(`before transfer`);
+    const tokenAccountInfo1 =  await getAccount(provider.connection, voter1TokenAccount1.address);
+    console.log("Total tokens on voter1: %d",tokenAccountInfo1.amount);
+
+    await program.methods
+      .pickWinner()
+      .accounts({
+        voter: voter.publicKey,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        voterAta: voter1TokenAccount1.address,
+        escrowAccount: escrow_pda,
+        systemProgram: SystemProgram.programId,
+        player: voter.publicKey,
+      })
+      .signers([voter])
+      .rpc();
+      let winner = await program.account.vote.fetch(voter.publicKey)
+      console.log(winner)
+
+      console.log(`finished transfer with transfer`);
+      const tokenAccountInfo2 =  await getAccount(provider.connection, voter1TokenAccount1.address);
+      console.log("Total tokens on voter1: %d",tokenAccountInfo2.amount);
+    });
 
       // winner and transfer   
 

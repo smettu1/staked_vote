@@ -81,21 +81,31 @@ pub mod staked_voting {
         Ok(())
     } 
 
-    // // Payout prize to the winner
-    // pub fn pay_out_winner(ctx: Context<Payout>) -> Result<()> {
+    // // // Payout prize to the winner
+    pub fn pay_out_winner(ctx: Context<Payout>) -> Result<()> {
 
-    //     // Check if it matches the winner address
-    //     let lottery: &mut Account<Lottery> = &mut ctx.accounts.lottery;
-    //     let recipient: &mut AccountInfo =  &mut ctx.accounts.winner;        
+        // Check if it matches the winner address
+        let _voter: &mut Account<Vote> = &mut ctx.accounts.voter;
 
-    //     // Get total money stored under original lottery account
-    //     let balance: u64 = lottery.to_account_info().lamports();                      
-            
-    //     **lottery.to_account_info().try_borrow_mut_lamports()? -= balance;
-    //     **recipient.to_account_info().try_borrow_mut_lamports()? += balance; 
-        
-    //     Ok(())
-    // }
+        // Get total money stored under original lottery account
+        // let balance: u64 = lottery.to_account_info().lamports();                      
+        // **lottery.to_account_info().try_borrow_mut_lamports()? -= balance;
+        // **recipient.to_account_info().try_borrow_mut_lamports()? += balance; 
+
+        // Stake tokens from voter account to escrow account.
+        let cpi_accounts = Transfer {
+            from: ctx.accounts.escrow_account.to_account_info().clone(),
+            to: ctx.accounts.voter_ata.to_account_info().clone(),
+            authority: ctx.accounts.voter.to_account_info().clone(),
+        };
+        token::transfer(
+            CpiContext::new(ctx.accounts.token_program.clone(), cpi_accounts),
+            //voter.stake_amount,
+            1,
+        )?;
+
+        Ok(())
+    }
 }
 
 // Contexts
@@ -124,20 +134,23 @@ pub struct Create<'info> {
     pub system_program: Program<'info, System>,
 }
 
-    // CHECK: This is not dangerous because we don't read or write from this account
-    //pub token_program: AccountInfo<'info>,
 #[derive(Accounts)]
 pub struct Submit<'info> {    
-    // #[account(init, 
-    //     seeds = [
-    //         player.key().as_ref()
-    //     ], 
-    //     constraint = player.to_account_info().lamports() >= voter.stake_amount,
-    //     bump, 
-    //     payer = player, 
-    //     space=80
-    // )]
-    // pub choice: Account<'info, Choice>, 
+    /// CHECK ignore this account
+    pub token_program: AccountInfo<'info>,
+    #[account(mut)] 
+    pub voter_ata: Account<'info, TokenAccount>, // Program account to store data
+    #[account(mut)] 
+    pub escrow_account: Account<'info, TokenAccount>,
+    #[account(mut)]                                 
+    pub player: Signer<'info>,                     // Payer for account creation    
+    #[account(mut)]       
+    pub voter: Account<'info, Vote>,          // To retrieve and increment counter        
+    pub system_program: Program<'info, System>,    
+}
+
+#[derive(Accounts)]
+pub struct Payout<'info> {    
     /// CHECK ignore this account
     pub token_program: AccountInfo<'info>,
     #[account(mut)] 
