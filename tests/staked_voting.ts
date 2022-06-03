@@ -150,6 +150,7 @@ describe("StakedVoting", () => {
     // create pda-ata, while voting we will transfer token and send choice
   });
 
+  // Init accounts 
   it("Creates a voter account", async () => {
     const [escrow_pda, escrow_bump] =
       await PublicKey.findProgramAddress(
@@ -172,6 +173,7 @@ describe("StakedVoting", () => {
       .rpc();
   });
 
+  //Submit vote for each of voters
   it("Submits a vote for player", async () => {
     // Get starting balances for player1 and lottery account
     let startBalancePlayer: number = await provider.connection.getBalance(
@@ -206,20 +208,54 @@ describe("StakedVoting", () => {
     .rpc();
   });
 
-    // Pick a winner
-    it("Pick a winner", async () => {
-      await program.methods
-        .pickWinner()
-        .accounts({
-          voter: voter.publicKey,
-          admin: voter_admin.publicKey,
-          systemProgram: SystemProgram.programId,
-        })
-        .signers([voter_admin])
-        .rpc();
-        let winner = await program.account.vote.fetch(voter.publicKey)
-        console.log(winner)
-      });
+  // Pick a winner
+  it("Pick a winner", async () => {
+    const [escrow_pda, escrow_bump] = await PublicKey.findProgramAddress(
+      [Buffer.from(ESCROW_ACCOUNT_PDA_SEED, 'utf8')],
+      program.programId
+    );
+
+
+    console.log(`before transfer`);
+    const tokenAccountInfo1 =  await getAccount(provider.connection, voter1TokenAccount1.address);
+    console.log("Total tokens on voter1: %d",tokenAccountInfo1.amount);
+
+    await program.methods
+      .pickWinner()
+      .accounts({
+        voter: voter.publicKey,
+        admin: voter_admin.publicKey,
+        systemProgram: SystemProgram.programId,
+      })
+      .signers([voter_admin])
+      .rpc();
+      let winner = await program.account.vote.fetch(voter.publicKey)
+      console.log(winner)
+
+
+      console.log(`Before transfer with transfer`);
+      const tokenAccountInfo3 =  await getAccount(provider.connection, voter1TokenAccount1.address);
+      console.log("Total tokens on voter1: %d",tokenAccountInfo3.amount);
+
+    // Pay to voter1
+    await program.methods
+    .payOutWinner()
+    .accounts({
+      voter: voter.publicKey,
+      systemProgram: SystemProgram.programId,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      voterAta: voter1TokenAccount1.address,
+      escrowAccount: escrow_pda,
+      //player: voter1.publicKey,
+    })
+    .signers([voter])
+    .rpc();
+
+      console.log(`finished transfer with transfer`);
+      const tokenAccountInfo2 =  await getAccount(provider.connection, voter1TokenAccount1.address);
+      console.log("Total tokens on voter1: %d",tokenAccountInfo2.amount);
+
+    });
 
       // winner and transfer   
 
@@ -228,20 +264,20 @@ describe("StakedVoting", () => {
         //   
     // Typescript 
     
+    // const toTokenAccount = await getOrCreateAssociatedTokenAccount(
+    //   provider.connection, voter1, mint, escrow_pda);
+    // console.log(`PDA token account toTokenAccount ${toTokenAccount.address}`);
+
+    // const signature = await transfer(
+    //       provider.connection,
+    //       voter1,
+    //       voter1TokenAccount1.address,
+    //       toTokenAccount.address,
+    //       voter1.publicKey,
+    //       1 // 1 token
+    //   );
 
 
-    // // const toTokenAccount = await getOrCreateAssociatedTokenAccount(
-    // //   provider.connection, voter1, mint, escrow_pda);
-    // // console.log(`PDA token account toTokenAccount ${toTokenAccount.address}`);
-
-    // // const signature = await transfer(
-    // //       provider.connection,
-    // //       voter1,
-    // //       voter1TokenAccount1.address,
-    // //       toTokenAccount.address,
-    // //       voter1.publicKey,
-    // //       1 // 1 token
-    // //   );
 
     // // TODO we need to caliculate the winner after last person votes
     
