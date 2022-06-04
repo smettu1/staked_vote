@@ -9,8 +9,7 @@ const Auth = () => {
     console.log(result);
   };
   return (
-    <>
-      <div>Simple Solana Voting Dapp</div>
+    <div className="flex h-full w-full flex-col items-center justify-center">
       <button
         className="mt-3 flex items-center justify-center bg-secondary px-2 py-1 text-white drop-shadow-xl transition duration-150 ease-out hover:bg-secondary-highlight hover:drop-shadow-2xl md:text-xl lg:text-3xl"
         onClick={handleConnect}
@@ -22,7 +21,7 @@ const Auth = () => {
         />
         Connect with phantom
       </button>
-    </>
+    </div>
   );
 };
 

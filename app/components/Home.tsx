@@ -1,13 +1,12 @@
 import React from "react";
+import Voting from "./Voting";
 import WalletInfo from "./WalletInfo";
 
 const Home = () => {
   return (
-    <div>
-      Home{" "}
-      <div>
-        <WalletInfo />
-      </div>
+    <div className="flex h-full w-full flex-row justify-between">
+      <WalletInfo />
+      <Voting />
     </div>
   );
 };

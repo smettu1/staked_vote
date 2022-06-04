@@ -10,7 +10,10 @@ const Layout = ({ children }: { children: React.ReactElement }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>{children}</main>
+      <main className="mx-8 my-5 flex h-full w-full flex-col items-center">
+        <div className="mb-3 md:text-5xl">Simple Solana Voting Dapp</div>
+        {children}
+      </main>
 
       <footer></footer>
     </div>
