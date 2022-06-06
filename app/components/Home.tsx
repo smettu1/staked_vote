@@ -1,5 +1,5 @@
 import React from "react";
-import Voting from "./Voting";
+import Voting from "./Voting/Voting";
 import WalletInfo from "./WalletInfo";
 
 const Home = () => {

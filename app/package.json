@@ -10,13 +10,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@project-serum/anchor": "^0.25.0-beta.1",
+    "@solana/web3.js": "^1.43.5",
     "@walletconnect/web3-provider": "^1.7.8",
     "@web3auth/web3auth": "^1.0.0",
+    "clsx": "^1.1.1",
     "magic-sdk": "^8.1.1",
     "moralis": "^1.8.0",
     "next": "12.1.6",
     "react": "18.1.0",
     "react-dom": "18.1.0",
+    "react-icons": "^4.4.0",
     "react-moralis": "^1.4.0"
   },
   "devDependencies": {
@@ -24,6 +28,8 @@
     "@types/react": "18.0.11",
     "@types/react-dom": "18.0.5",
     "@types/tailwindcss": "^3.0.10",
+    "@typescript-eslint/eslint-plugin": "^5.27.0",
+    "@typescript-eslint/parser": "^5.27.0",
     "autoprefixer": "^10.4.7",
     "eslint": "8.17.0",
     "eslint-config-next": "12.1.6",
