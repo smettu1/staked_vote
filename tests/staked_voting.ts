@@ -34,6 +34,10 @@ describe("StakedVoting", () => {
   anchor.setProvider(anchor.AnchorProvider.local());
   const LAMPORTS_PER_SOL = 1000000000;
   let voter1TokenAccount1 = null;
+  let voter2TokenAccount1 = null;
+  let voter3TokenAccount1 = null;
+  let voter4TokenAccount1 = null;
+  let voter5TokenAccount1 = null;
 
   const program = anchor.workspace.StakedVoting as Program<StakedVoting>;
   // Account address generated here
@@ -93,8 +97,8 @@ describe("StakedVoting", () => {
     );
 
       // Mint tokens
-      let fromTokenAccount: Account; 
-      mint = await createMint(
+    let fromTokenAccount: Account; 
+    mint = await createMint(
         provider.connection, 
         voter, 
         voter.publicKey, 
@@ -128,6 +132,7 @@ describe("StakedVoting", () => {
     const tokenAccountInfo = await getAccount(provider.connection, fromTokenAccount.address);
     console.log(tokenAccountInfo.amount);
 
+    //Send to voter1 ATA
     voter1TokenAccount1 = await getOrCreateAssociatedTokenAccount(
       provider.connection, 
       voter1, 
@@ -142,10 +147,78 @@ describe("StakedVoting", () => {
       voter.publicKey,
       10 // 1 token
     );
+    //Send to voter2 ATA
+    voter2TokenAccount1 = await getOrCreateAssociatedTokenAccount(
+      provider.connection, 
+      voter2, 
+      mint, 
+      voter2.publicKey);
+    // Transfer minted tokens to each accounts
+    const signature2 = await transfer(
+      provider.connection,
+      voter,
+      fromTokenAccount.address,
+      voter2TokenAccount1.address,
+      voter.publicKey,
+      10 // 1 token
+    );
+    //Send to voter3 ATA
+    voter3TokenAccount1 = await getOrCreateAssociatedTokenAccount(
+      provider.connection, 
+      voter3, 
+      mint, 
+      voter3.publicKey);
+    // Transfer minted tokens to each accounts
+    const signature3 = await transfer(
+      provider.connection,
+      voter,
+      fromTokenAccount.address,
+      voter3TokenAccount1.address,
+      voter.publicKey,
+      10 // 1 token
+    );
+    //Send to voter4 ATA
+    voter4TokenAccount1 = await getOrCreateAssociatedTokenAccount(
+      provider.connection, 
+      voter4, 
+      mint, 
+      voter4.publicKey);
+    // Transfer minted tokens to each accounts
+    const signature4 = await transfer(
+      provider.connection,
+      voter,
+      fromTokenAccount.address,
+      voter4TokenAccount1.address,
+      voter.publicKey,
+      10 // 1 token
+    );
+    //Send to voter4 ATA
+    voter5TokenAccount1 = await getOrCreateAssociatedTokenAccount(
+      provider.connection, 
+      voter5, 
+      mint, 
+      voter5.publicKey);
+    // Transfer minted tokens to each accounts
+    const signature5 = await transfer(
+      provider.connection,
+      voter,
+      fromTokenAccount.address,
+      voter5TokenAccount1.address,
+      voter.publicKey,
+      10 // 1 token
+    );
+
     console.log(`finished transfer with ${signature}`);
     const tokenAccountInfo1 = await getAccount(provider.connection, voter1TokenAccount1.address);
+    const tokenAccountInfo2 = await getAccount(provider.connection, voter2TokenAccount1.address);
+    const tokenAccountInfo3 = await getAccount(provider.connection, voter3TokenAccount1.address);
+    const tokenAccountInfo4 = await getAccount(provider.connection, voter4TokenAccount1.address);
+    const tokenAccountInfo5 = await getAccount(provider.connection, voter5TokenAccount1.address);
     console.log("Total tokens on voter1: %d",tokenAccountInfo1.amount);
-
+    console.log("Total tokens on voter2: %d",tokenAccountInfo2.amount);
+    console.log("Total tokens on voter3: %d",tokenAccountInfo3.amount);
+    console.log("Total tokens on voter4: %d",tokenAccountInfo4.amount);
+    console.log("Total tokens on voter5: %d",tokenAccountInfo5.amount);
     // PDA to stake the tokens
     // create pda-ata, while voting we will transfer token and send choice
   });
@@ -159,7 +232,7 @@ describe("StakedVoting", () => {
       );
 
     await program.methods
-      .initializeVoting(new anchor.BN(LAMPORTS_PER_SOL),5)
+      .initializeVoting(new anchor.BN(10),5)
       .accounts({
         voter: voter.publicKey,
         admin: voter_admin.publicKey,
@@ -206,19 +279,69 @@ describe("StakedVoting", () => {
     })
     .signers([voter1])
     .rpc();
+    // Voter2 votes
+    await program.methods
+    .voteCandidate(new anchor.BN(2))
+    .accounts({
+      voter: voter.publicKey,
+      systemProgram: SystemProgram.programId,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      voterAta: voter2TokenAccount1.address,
+      escrowAccount: escrow_pda,
+      player: voter2.publicKey,
+    })
+    .signers([voter2])
+    .rpc();
+    // Voter3 votes
+    await program.methods
+    .voteCandidate(new anchor.BN(1))
+    .accounts({
+      voter: voter.publicKey,
+      systemProgram: SystemProgram.programId,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      voterAta: voter3TokenAccount1.address,
+      escrowAccount: escrow_pda,
+      player: voter3.publicKey,
+    })
+    .signers([voter3])
+    .rpc();
+    // Voter4 votes
+    await program.methods
+    .voteCandidate(new anchor.BN(2))
+    .accounts({
+      voter: voter.publicKey,
+      systemProgram: SystemProgram.programId,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      voterAta: voter4TokenAccount1.address,
+      escrowAccount: escrow_pda,
+      player: voter4.publicKey,
+    })
+    .signers([voter4])
+    .rpc();
+    // Voter5 votes
+    await program.methods
+    .voteCandidate(new anchor.BN(1))
+    .accounts({
+      voter: voter.publicKey,
+      systemProgram: SystemProgram.programId,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      voterAta: voter5TokenAccount1.address,
+      escrowAccount: escrow_pda,
+      player: voter5.publicKey,
+    })
+    .signers([voter5])
+    .rpc();
   });
 
-  // Pick a winner
+  // Pick a winner from the votes
   it("Pick a winner", async () => {
     const [escrow_pda, escrow_bump] = await PublicKey.findProgramAddress(
       [Buffer.from(ESCROW_ACCOUNT_PDA_SEED, 'utf8')],
       program.programId
     );
-
-
-    console.log(`before transfer`);
-    const tokenAccountInfo1 =  await getAccount(provider.connection, voter1TokenAccount1.address);
-    console.log("Total tokens on voter1: %d",tokenAccountInfo1.amount);
+    // console.log(`before transfer`);
+    // const tokenAccountInfo1 =  await getAccount(provider.connection, voter1TokenAccount1.address);
+    // console.log("Total tokens on voter1: %d",tokenAccountInfo1.amount);
 
     await program.methods
       .pickWinner()
@@ -231,11 +354,9 @@ describe("StakedVoting", () => {
       .rpc();
       let winner = await program.account.vote.fetch(voter.publicKey)
       console.log(winner)
-
-
-      console.log(`Before transfer with transfer`);
-      const tokenAccountInfo3 =  await getAccount(provider.connection, voter1TokenAccount1.address);
-      console.log("Total tokens on voter1: %d",tokenAccountInfo3.amount);
+      // console.log(`Before transfer with transfer`);
+      // const tokenAccountInfo3 =  await getAccount(provider.connection, voter1TokenAccount1.address);
+      // console.log("Total tokens on voter1: %d",tokenAccountInfo3.amount);
 
     // Pay to voter1
     await program.methods
@@ -246,14 +367,23 @@ describe("StakedVoting", () => {
       tokenProgram: TOKEN_PROGRAM_ID,
       voterAta: voter1TokenAccount1.address,
       escrowAccount: escrow_pda,
-      //player: voter1.publicKey,
+      voterac: voter.publicKey,
     })
     .signers([voter])
     .rpc();
+    
+    console.log(`finished transfer with transfer`);
+    const tokenAccountInfo1 =  await getAccount(provider.connection, voter1TokenAccount1.address);
+    const tokenAccountInfo2 =  await getAccount(provider.connection, voter2TokenAccount1.address);
+    const tokenAccountInfo3 =  await getAccount(provider.connection, voter3TokenAccount1.address);
+    const tokenAccountInfo4 =  await getAccount(provider.connection, voter4TokenAccount1.address);
+    const tokenAccountInfo5 =  await getAccount(provider.connection, voter5TokenAccount1.address);
 
-      console.log(`finished transfer with transfer`);
-      const tokenAccountInfo2 =  await getAccount(provider.connection, voter1TokenAccount1.address);
-      console.log("Total tokens on voter1: %d",tokenAccountInfo2.amount);
+    console.log("Total tokens on voter1: %d",tokenAccountInfo1.amount);
+    console.log("Total tokens on voter2: %d",tokenAccountInfo2.amount);
+    console.log("Total tokens on voter3: %d",tokenAccountInfo3.amount);
+    console.log("Total tokens on voter4: %d",tokenAccountInfo4.amount);
+    console.log("Total tokens on voter5: %d",tokenAccountInfo5.amount);
 
     });
 

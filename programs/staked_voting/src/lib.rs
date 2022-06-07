@@ -28,21 +28,7 @@ pub mod staked_voting {
         
         // Deserialize voter account and transfer amount, note the choice
         let voter: &mut Account<Vote> = &mut ctx.accounts.voter;          
-
-        // Transfer lamports to the lottery account
-        // let ix = anchor_lang::solana_program::system_instruction::transfer(
-        //     &player.key(),
-        //     &voter.key(),
-        //     voter.stake_amount,
-        // );
-        // anchor_lang::solana_program::program::invoke(
-        //     &ix,
-        //     &[
-        //         player.to_account_info(),
-        //         voter.to_account_info(),
-        //     ],
-        // )?;
-
+        msg!("Staked amount is {}",voter.stake_amount);
         // Stake tokens from voter account to escrow account.
         let cpi_accounts = Transfer {
             from: ctx.accounts.voter_ata.to_account_info().clone(),
@@ -51,8 +37,7 @@ pub mod staked_voting {
         };
         token::transfer(
             CpiContext::new(ctx.accounts.token_program.clone(), cpi_accounts),
-            //voter.stake_amount,
-            1,
+            voter.stake_amount,
         )?;
         // Save voter's
         voter.voting_choice.push(idx);       
@@ -85,31 +70,16 @@ pub mod staked_voting {
     pub fn pay_out_winner(ctx: Context<Payout>) -> Result<()> {
 
         // Check if it matches the winner address
-        //let _voter: &mut Account<Vote> = &mut ctx.accounts.voter;
-
-        // Get total money stored under original lottery account
-        // let balance: u64 = lottery.to_account_info().lamports();                      
-        // **lottery.to_account_info().try_borrow_mut_lamports()? -= balance;
-        // **recipient.to_account_info().try_borrow_mut_lamports()? += balance; 
-        // let (_escrow_account, escrow_account_bump) =
-        // Pubkey::find_program_address(&[ESCROW_ACCOUNT_PDA_SEED], ctx.program_id);
-        //let escrow_seeds = &[&ESCROW_ACCOUNT_PDA_SEED, &[escrow_account_bump][..]];
-        
-        // msg!("winner winner {:?} {:?} {:?}",ctx.accounts.escrow_account.to_account_info(),
-        // ctx.accounts.voter_ata.to_account_info(),
-        // ctx.accounts.voter.to_account_info());
-        // msg!("escrow {:?}",_escrow_account);
-        // Stake tokens from voter account to escrow account.
-
+        let voter: &mut Account<Vote> = &mut ctx.accounts.voterac;
         let cpi_accounts = Transfer {
             from: ctx.accounts.escrow_account.to_account_info(),
             to: ctx.accounts.voter_ata.to_account_info().clone(),
             authority: ctx.accounts.voter.to_account_info().clone(),
         };
+        let totaltokens  =  voter.stake_amount  * voter.total_participants as u64;
         token::transfer(
             CpiContext::new(ctx.accounts.token_program.clone(), cpi_accounts),
-            //voter.stake_amount,
-            1,
+            totaltokens,
         )?;
 
         Ok(())
@@ -167,8 +137,8 @@ pub struct Payout<'info> {
     pub escrow_account: Account<'info, TokenAccount>,
     #[account(mut)]                                 
     pub voter: Signer<'info>,                     // Payer for account creation    
-    // #[account(mut)]       
-    // pub voter: Account<'info, Vote>,          // To retrieve and increment counter        
+    #[account(mut)]       
+    pub voterac: Account<'info, Vote>,          // To retrieve and increment counter        
     pub system_program: Program<'info, System>,    
 }
 
