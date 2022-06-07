@@ -1,7 +1,11 @@
 import Head from "next/head";
 import React from "react";
 
-const Layout = ({ children }: { children: React.ReactElement }) => {
+const Layout = ({
+  children,
+}: {
+  children: React.ReactElement | React.ReactElement[];
+}) => {
   return (
     <div className="flex h-screen w-screen flex-row bg-primary text-highlight">
       <Head>

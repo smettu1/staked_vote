@@ -1,12 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 import React from "react";
-import { useMoralis } from "react-moralis";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 const Auth = () => {
-  const { authenticate } = useMoralis();
+  const { wallets, select } = useWallet();
   const handleConnect = async () => {
-    const result = await authenticate({ type: "sol", network: "devnet" });
-    console.log(result);
+    select(wallets[0].adapter.name);
   };
   return (
     <div className="flex h-full w-full flex-col items-center justify-center">

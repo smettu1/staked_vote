@@ -1,38 +1,31 @@
-/* global Moralis */
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
-import { MoralisProvider } from "react-moralis";
 import Layout from "../components/Layout";
-import { WalletProvider } from "@solana/wallet-adapter-react";
+import {
+  ConnectionProvider,
+  WalletProvider,
+} from "@solana/wallet-adapter-react";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
-
-// declare var Moralis: any;
+import { clusterApiUrl } from "@solana/web3.js";
+import { useMemo } from "react";
+import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 
 function MyApp({ Component, pageProps }: AppProps) {
-  // Moralis.settings.setAPIRateLimit({
-  //   anonymous: 10,
-  //   authenticated: 20,
-  //   windowMs: 60000,
-  // });
-
-  // DEFAULT VALUES MIGHT NOT WORK IN THE FUTURE, IN THAT CASE
-  // CREATE A NEW .env FILE FROM .env.template AND
-  // ADD THE VALUES FROM A NEW MORALIS TEST SERVER (https://admin.moralis.io/servers)
-  const moralisServerUrl =
-    process.env.NEXT_PUBLIC_MORALIS_SERVER_URL ??
-    "https://fnrpo4bxefqa.usemoralis.com:2053/server";
-  const moralisAppId =
-    process.env.NEXT_PUBLIC_MORALIS_APP_ID ??
-    "DFnNGYqrDacjlzlHmBNazb4VTAyvMIyZV4PR82pu";
-
+  const network = WalletAdapterNetwork.Devnet;
+  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+  const walletAdapter = new PhantomWalletAdapter();
   return (
-    <MoralisProvider serverUrl={moralisServerUrl} appId={moralisAppId}>
-      <WalletProvider wallets={[new PhantomWalletAdapter()]} autoConnect>
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider
+        onError={(error) => console.log("error connecting", error)}
+        wallets={[walletAdapter]}
+        autoConnect
+      >
         <Layout>
           <Component {...pageProps} />
         </Layout>
       </WalletProvider>
-    </MoralisProvider>
+    </ConnectionProvider>
   );
 }
 

@@ -13,30 +13,30 @@ import {
   getOrCreateAssociatedTokenAccount,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
-import { useMoralis } from "react-moralis";
 import { PROGRAM_ID } from "../../anchor/idl/programId";
 import Button from "../buttons/Button";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { WalletNotConnectedError } from "@solana/wallet-adapter-base";
 
 const ESCROW_ACCOUNT_PDA_SEED = "escrow_12";
 
 const Voting = () => {
-  const { user } = useMoralis();
+  const { connection } = useConnection();
   const { sendTransaction, publicKey } = useWallet();
 
   // useSolana;
   const handleVote = async () => {
     try {
-      const userPK = new PublicKey(user?.get("solAddress"));
+      if (!publicKey) throw new WalletNotConnectedError();
+      const userPK = publicKey as PublicKey;
       const playerPK = new PublicKey(userPK); // hardcoded for now
       const [escrow_pda, escrow_bump] = await PublicKey.findProgramAddress(
         [Buffer.from(ESCROW_ACCOUNT_PDA_SEED, "utf8")],
         PROGRAM_ID
       );
-      const connection = new Connection(clusterApiUrl("devnet"));
       const tx = new Transaction();
       const voterATA = await getAssociatedTokenAddress(
-        new PublicKey("2wNfZTMkUndd5rSbWy1H7Ri17XgHWzLcULAnbuJsSQH7"), // got it from deploy
+        new PublicKey("GyPi4sYEjaCqGCRgEiepiUJkHQVMhkRBErK3wVUMbdBK"), // got it from deploy
         playerPK
       );
       const voteInstruction = voteCandidate(
@@ -45,7 +45,7 @@ const Voting = () => {
           tokenProgram: TOKEN_PROGRAM_ID,
           escrowAccount: escrow_pda,
           player: playerPK,
-          voter: userPK,
+          voter: userPK as PublicKey,
           voterAta: voterATA,
           systemProgram: SystemProgram.programId,
         }
@@ -54,6 +54,7 @@ const Voting = () => {
       // window.solana.signTransaction(tx);
       // const result = await sendAndConfirmTransaction(connection, tx, []);
       console.log("sending tx");
+      console.log(voteInstruction);
       const result = await sendTransaction(tx, connection);
       console.log(result);
     } catch (error) {

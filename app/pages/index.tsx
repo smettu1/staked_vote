@@ -1,15 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
+import { useWallet } from "@solana/wallet-adapter-react";
 import type { NextPage } from "next";
-import Head from "next/head";
-import { useMoralis, useMoralisSolanaApi } from "react-moralis";
 import Auth from "../components/Auth";
 import Home from "../components/Home";
 
 const Index: NextPage = () => {
-  const { isAuthenticated, authenticate, logout, user } = useMoralis();
-  // const {} = useMoralisSolanaApi();
+  const { connected } = useWallet();
 
-  if (!isAuthenticated) return <Auth />;
+  if (!connected) return <Auth />;
 
   return <Home />;
 };
