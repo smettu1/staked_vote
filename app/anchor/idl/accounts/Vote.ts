@@ -10,6 +10,7 @@ export interface VoteFields {
   totalParticipants: number
   stakeAmount: BN
   votingChoice: Array<number>
+  votesRemaining: number
 }
 
 export interface VoteJSON {
@@ -19,6 +20,7 @@ export interface VoteJSON {
   totalParticipants: number
   stakeAmount: string
   votingChoice: Array<number>
+  votesRemaining: number
 }
 
 export class Vote {
@@ -28,6 +30,7 @@ export class Vote {
   readonly totalParticipants: number
   readonly stakeAmount: BN
   readonly votingChoice: Array<number>
+  readonly votesRemaining: number
 
   static readonly discriminator = Buffer.from([
     96, 91, 104, 57, 145, 35, 172, 155,
@@ -40,6 +43,7 @@ export class Vote {
     borsh.i32("totalParticipants"),
     borsh.u64("stakeAmount"),
     borsh.vec(borsh.u32(), "votingChoice"),
+    borsh.i32("votesRemaining"),
   ])
 
   constructor(fields: VoteFields) {
@@ -49,6 +53,7 @@ export class Vote {
     this.totalParticipants = fields.totalParticipants
     this.stakeAmount = fields.stakeAmount
     this.votingChoice = fields.votingChoice
+    this.votesRemaining = fields.votesRemaining
   }
 
   static async fetch(c: Connection, address: PublicKey): Promise<Vote | null> {
@@ -96,6 +101,7 @@ export class Vote {
       totalParticipants: dec.totalParticipants,
       stakeAmount: dec.stakeAmount,
       votingChoice: dec.votingChoice,
+      votesRemaining: dec.votesRemaining,
     })
   }
 
@@ -107,6 +113,7 @@ export class Vote {
       totalParticipants: this.totalParticipants,
       stakeAmount: this.stakeAmount.toString(),
       votingChoice: this.votingChoice,
+      votesRemaining: this.votesRemaining,
     }
   }
 
@@ -118,6 +125,7 @@ export class Vote {
       totalParticipants: obj.totalParticipants,
       stakeAmount: new BN(obj.stakeAmount),
       votingChoice: obj.votingChoice,
+      votesRemaining: obj.votesRemaining,
     })
   }
 }
