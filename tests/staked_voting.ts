@@ -331,6 +331,7 @@ describe("StakedVoting", () => {
     })
     .signers([voter5])
     .rpc();
+
   });
 
   // Pick a winner from the votes
@@ -339,9 +340,6 @@ describe("StakedVoting", () => {
       [Buffer.from(ESCROW_ACCOUNT_PDA_SEED, 'utf8')],
       program.programId
     );
-    // console.log(`before transfer`);
-    // const tokenAccountInfo1 =  await getAccount(provider.connection, voter1TokenAccount1.address);
-    // console.log("Total tokens on voter1: %d",tokenAccountInfo1.amount);
 
     await program.methods
       .pickWinner()
@@ -354,9 +352,6 @@ describe("StakedVoting", () => {
       .rpc();
       let winner = await program.account.vote.fetch(voter.publicKey)
       console.log(winner)
-      // console.log(`Before transfer with transfer`);
-      // const tokenAccountInfo3 =  await getAccount(provider.connection, voter1TokenAccount1.address);
-      // console.log("Total tokens on voter1: %d",tokenAccountInfo3.amount);
 
     // Pay to voter1
     await program.methods
@@ -372,7 +367,7 @@ describe("StakedVoting", () => {
     .signers([voter])
     .rpc();
     
-    console.log(`finished transfer with transfer`);
+    console.log(`Winner is declared transfer`);
     const tokenAccountInfo1 =  await getAccount(provider.connection, voter1TokenAccount1.address);
     const tokenAccountInfo2 =  await getAccount(provider.connection, voter2TokenAccount1.address);
     const tokenAccountInfo3 =  await getAccount(provider.connection, voter3TokenAccount1.address);
@@ -386,124 +381,4 @@ describe("StakedVoting", () => {
     console.log("Total tokens on voter5: %d",tokenAccountInfo5.amount);
 
     });
-
-      // winner and transfer   
-
-    // UI
-        //  Create tokens, Airdrop to white listed accounts
-        //   
-    // Typescript 
-    
-    // const toTokenAccount = await getOrCreateAssociatedTokenAccount(
-    //   provider.connection, voter1, mint, escrow_pda);
-    // console.log(`PDA token account toTokenAccount ${toTokenAccount.address}`);
-
-    // const signature = await transfer(
-    //       provider.connection,
-    //       voter1,
-    //       voter1TokenAccount1.address,
-    //       toTokenAccount.address,
-    //       voter1.publicKey,
-    //       1 // 1 token
-    //   );
-
-
-
-    // // TODO we need to caliculate the winner after last person votes
-    
-    // // TODO Transfer the tokens to winner.
-
-    // // choose a vote option
-    // await program.methods
-    //   .voteCandidate(new anchor.BN(1))
-    //   .accounts({
-    //     voter: voter.publicKey,
-    //     player: voter1.publicKey,
-    //     choice: submission,
-    //     systemProgram: SystemProgram.programId,
-    //   })
-    //   .signers([voter1])
-    //   .rpc();
-
-  //   // Voting for voter2
-  //   const [submission1, bump1] = await anchor.web3.PublicKey.findProgramAddress(
-  //     [voter2.publicKey.toBytes()],
-  //     program.programId
-  //   );
-  //   await program.methods
-  //   .voteCandidate(new anchor.BN(2))
-  //   .accounts({
-  //     voter: voter.publicKey,
-  //     player: voter2.publicKey,
-  //     choice: submission1,
-  //     systemProgram: SystemProgram.programId,
-  //   })
-  //   .signers([voter2])
-  //   .rpc();
-
-  //   // Voting for voter3
-  //   const [submission2, bump2] = await anchor.web3.PublicKey.findProgramAddress(
-  //     [voter3.publicKey.toBytes()],
-  //     program.programId
-  //   );
-  //   await program.methods
-  //   .voteCandidate(new anchor.BN(1))
-  //   .accounts({
-  //     voter: voter.publicKey,
-  //     player: voter3.publicKey,
-  //     choice: submission2,
-  //     systemProgram: SystemProgram.programId,
-  //   })
-  //   .signers([voter3])
-  //   .rpc();
-
-  //   // Voting for voter4
-  //   const [submission3, bump3] = await anchor.web3.PublicKey.findProgramAddress(
-  //     [voter4.publicKey.toBytes()],
-  //     program.programId
-  //   );
-  //   await program.methods
-  //   .voteCandidate(new anchor.BN(1))
-  //   .accounts({
-  //     voter: voter.publicKey,
-  //     player: voter4.publicKey,
-  //     choice: submission3,
-  //     systemProgram: SystemProgram.programId,
-  //   })
-  //   .signers([voter4])
-  //   .rpc();
-      
-  //   // Voting for voter5
-  //   const [submission4, bump4] = await anchor.web3.PublicKey.findProgramAddress(
-  //     [voter5.publicKey.toBytes()],
-  //     program.programId
-  //   );
-  //   await program.methods
-  //   .voteCandidate(new anchor.BN(1))
-  //   .accounts({
-  //     voter: voter.publicKey,
-  //     player: voter5.publicKey,
-  //     choice: submission4,
-  //     systemProgram: SystemProgram.programId,
-  //   })
-  //   .signers([voter5])
-  //   .rpc();
-        
-  //   let VotingState1 = await program.account.vote.fetch(voter.publicKey)
-  //   console.log(VotingState1)
-  // });
-
-  // it("Pick a winner", async () => {
-  //   await program.methods
-  //     .pickWinner()
-  //     .accounts({
-  //       voter: voter.publicKey,
-  //       admin: voter_admin.publicKey,
-  //       systemProgram: SystemProgram.programId,
-  //     })
-  //     .signers([voter_admin])
-  //     .rpc();
-  //     let winner = await program.account.vote.fetch(voter.publicKey)
-  //     console.log(winner)
-
 });

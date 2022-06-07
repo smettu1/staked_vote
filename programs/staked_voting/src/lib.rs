@@ -19,6 +19,7 @@ pub mod staked_voting {
         voter.total_participants = voter_count;           
         voter.stake_amount = stake_amount;
         voter.voting_choice = Vec::new();
+        voter.votes_remaining = voter_count;
        msg!("init {:?}",escrow_ac.key());
         Ok(())
     }
@@ -40,7 +41,9 @@ pub mod staked_voting {
             voter.stake_amount,
         )?;
         // Save voter's
-        voter.voting_choice.push(idx);       
+        voter.voting_choice.push(idx); 
+        // reduce the voter count
+        voter.votes_remaining -=1;      
         Ok(())  
     }
 
@@ -168,4 +171,5 @@ pub struct Vote {
     pub total_participants: i32,
     pub stake_amount: u64,
     pub voting_choice: Vec<u32>,
+    pub votes_remaining: i32,
 }
