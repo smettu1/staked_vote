@@ -5,6 +5,7 @@ import {
   Transaction,
   SystemProgram,
   PublicKey,
+  clusterApiUrl,
 } from "@solana/web3.js";
 import { voteCandidate } from "../../anchor/idl/instructions";
 import {
@@ -15,11 +16,14 @@ import {
 import { useMoralis } from "react-moralis";
 import { PROGRAM_ID } from "../../anchor/idl/programId";
 import Button from "../buttons/Button";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 const ESCROW_ACCOUNT_PDA_SEED = "escrow_12";
 
 const Voting = () => {
   const { user } = useMoralis();
+  const { sendTransaction, publicKey } = useWallet();
+
   // useSolana;
   const handleVote = async () => {
     try {
@@ -29,7 +33,7 @@ const Voting = () => {
         [Buffer.from(ESCROW_ACCOUNT_PDA_SEED, "utf8")],
         PROGRAM_ID
       );
-      // const connection = new Connection("devnet");
+      const connection = new Connection(clusterApiUrl("devnet"));
       const tx = new Transaction();
       const voterATA = await getAssociatedTokenAddress(
         new PublicKey("2wNfZTMkUndd5rSbWy1H7Ri17XgHWzLcULAnbuJsSQH7"), // got it from deploy
@@ -47,9 +51,11 @@ const Voting = () => {
         }
       );
       tx.add(voteInstruction);
-      window.solana.signTransaction(tx);
+      // window.solana.signTransaction(tx);
       // const result = await sendAndConfirmTransaction(connection, tx, []);
-      // console.log(result);
+      console.log("sending tx");
+      const result = await sendTransaction(tx, connection);
+      console.log(result);
     } catch (error) {
       console.log(error);
     }

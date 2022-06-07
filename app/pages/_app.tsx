@@ -3,6 +3,8 @@ import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import { MoralisProvider } from "react-moralis";
 import Layout from "../components/Layout";
+import { WalletProvider } from "@solana/wallet-adapter-react";
+import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 
 // declare var Moralis: any;
 
@@ -25,9 +27,11 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <MoralisProvider serverUrl={moralisServerUrl} appId={moralisAppId}>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      <WalletProvider wallets={[new PhantomWalletAdapter()]} autoConnect>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </WalletProvider>
     </MoralisProvider>
   );
 }
