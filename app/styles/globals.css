@@ -1,0 +1,29 @@
+@import url("https://fonts.googleapis.com/css2?family=Baloo+2&display=swap");
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+:root {
+  --primary-color: #3f4473;
+  --primary-highlight-color: #54587e;
+  --secondary-color: #4936c6;
+  --secondary-highlight-color: #2f2280;
+  --highlight-color: white;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: "Baloo 2", -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+    Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
